@@ -2,11 +2,35 @@ module.exports = {
 
     /** @param {Creep} creep **/
     run: function(creep) {
+        
+        /*
+        // .find test
+        var targets = creep.room.find(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return ((structure.structureType == STRUCTURE_EXTENSION
+                    || structure.structureType == STRUCTURE_SPAWN) 
+                    && structure.energy < structure.energyCapacity)
+                    || ((structure.structureType == STRUCTURE_STORAGE)
+                    && _.sum(structure.store) < structure.storeCapacity)
+                    || ((structure.structureType == STRUCTURE_TOWER)
+                    && structure.energy < (structure.energyCapacity * .60))
+                    || ((structure.structureType == STRUCTURE_CONTAINER)
+                    && _.sum(structure.store) < structure.storeCapacity)
+            }
+        });
+        
+        console.log('targets:' + targets);
+        */
+        
+        
+        
+        
+        
 
         if(creep.memory.harvesting === undefined) { creep.memory.harvesting = true; }
         
-        var harvesters = _.filter(Game.creeps, (c) => c.memory.role == 'harvester');
-        var haulers = _.filter(Game.creeps, (c) => c.memory.role == 'hauler');
+        var harvesters = _.filter(Game.creeps, (c) => c.memory.role == 'harvester' && Game.creeps[c.name].room.name == creep.room.name);
+        var haulers = _.filter(Game.creeps, (c) => c.memory.role == 'hauler' && Game.creeps[c.name].room.name == creep.room.name);
         var sources = creep.room.find(FIND_SOURCES);
         
         if(haulers.length > 0) {
@@ -23,9 +47,10 @@ module.exports = {
                         min = harvestersAtSource.length;
                         leastOccupiedSource = source.id;
                     }
+                    console.log('Source ' + source.id + ' has ' + harvestersAtSource.length + ' harvesters');
                 });
                 
-                console.log('Assigning harvester to source: ' + leastOccupiedSource);
+                console.log('Assigning harvester ' + creep.name + ' to source: ' + leastOccupiedSource);
                 creep.memory.currentsource = leastOccupiedSource;
             }
             
@@ -37,6 +62,7 @@ module.exports = {
                     filter: (s) => s.structureType == STRUCTURE_CONTAINER
                     	&& _.sum(s.store) < s.storeCapacity
                 });
+                //console.log('distance to container from source: ' + source.pos.getRangeTo(container));
                 var distanceContainer = creep.pos.getRangeTo(container);
                 
                 if(distanceSource == 1 && distanceContainer == 1) {
@@ -55,6 +81,7 @@ module.exports = {
         }
         
         // below code only used when there are no haulers
+        //console.log('Alert, no haulers in room ' + creep.room.name);
         
         if(creep.memory.wait === undefined) { creep.memory.wait = 0; }
         

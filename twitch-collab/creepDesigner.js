@@ -15,7 +15,7 @@ module.exports = {
     if(canSpend > options.cap){
       var canSpend = options.cap
     }
-
+    
     var creep = options.base
     var add = true
     var extendIndex = 0
@@ -35,7 +35,7 @@ module.exports = {
         }
       }
     }
-
+    
     return creep
   },
 

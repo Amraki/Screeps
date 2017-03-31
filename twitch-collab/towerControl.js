@@ -23,14 +23,44 @@ module.exports = {
         if(closestHostile){
           tower.attack(closestHostile);
         } else if(tower.energy / tower.energyCapacity >= 0.9) {
-            var repairTarget = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+            /*
+                var repairTarget = tower.pos.findClosestByRange(FIND_STRUCTURES, {
                 filter: (s) => ((s.structureType == STRUCTURE_WALL || s.structureType == STRUCTURE_RAMPART)
                 && s.hits < 100000) || (s.structureType == STRUCTURE_ROAD && (s.hits / s.hitsMax) < 0.5)
             })
+            */
+            
+            // high priority: very low walls and ramparts
+            var repairTargets = tower.room.find(FIND_STRUCTURES, {
+                filter: (s) => (s.structureType == STRUCTURE_WALL 
+                        || s.structureType == STRUCTURE_RAMPART)
+                        && s.hits < 10000
+            });
+            // repair roads
+            if(repairTargets.length == 0) {
+                repairTargets = tower.room.find(FIND_STRUCTURES, {
+                    filter: (s) => s.structureType == STRUCTURE_ROAD
+                        && s.hits / s.hitsMax < 0.90
+                });
+            }
+            // repair containers
+            if(repairTargets.length == 0) {
+                repairTargets = tower.room.find(FIND_STRUCTURES, {
+                    filter: (s) => s.structureType == STRUCTURE_CONTAINER
+                        && s.hits / s.hitsMax < 0.90
+                });
+            }
+            // low priority: build up walls and ramparts higher
+            if(repairTargets.length == 0) {
+                repairTargets = tower.room.find(FIND_STRUCTURES, {
+                    filter: (s) => (s.structureType == STRUCTURE_WALL 
+                            || s.structureType == STRUCTURE_RAMPART)
+                            && s.hits < 100000
+                });
+            }
     
-            if(repairTarget){
-                //console.log(repairTarget);
-                tower.repair(repairTarget);
+            if(repairTargets.length > 0){
+                tower.repair(repairTargets[0]);
             }
         }
     }
